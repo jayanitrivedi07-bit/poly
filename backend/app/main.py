@@ -5,7 +5,11 @@ from app.api.router import api_router
 from app.database.session import engine, Base
 
 # Create DB tables if not exist
-Base.metadata.create_all(bind=engine)
+try:
+    Base.metadata.create_all(bind=engine)
+except Exception as e:
+    import logging
+    logging.getLogger("uvicorn.error").warning(f"Database initialization warning: {e}")
 
 app = FastAPI(
     title=settings.PROJECT_NAME,

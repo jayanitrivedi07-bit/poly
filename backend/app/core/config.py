@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     # Database URL
     DATABASE_URL: str = os.getenv(
         "DATABASE_URL", 
-        "sqlite:///./poly.db"
+        "sqlite:////tmp/poly.db" if (os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME")) else "sqlite:///./poly.db"
     )
     
     # Agora Configuration

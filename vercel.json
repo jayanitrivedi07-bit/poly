@@ -22,11 +22,16 @@
       "dest": "backend/main.py"
     },
     {
-      "handle": "filesystem"
+      "src": "/assets/(.*)",
+      "dest": "/frontend/assets/$1"
+    },
+    {
+      "src": "/(.*\\.(?:ico|png|jpg|jpeg|svg|css|js|json|webmanifest|txt|woff|woff2|ttf|eot))",
+      "dest": "/frontend/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/frontend/index.html"
     }
   ]
 }
