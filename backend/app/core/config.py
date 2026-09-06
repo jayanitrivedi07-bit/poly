@@ -1,4 +1,7 @@
 import os
+import re
+from typing import Any
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
@@ -28,8 +31,19 @@ class Settings(BaseSettings):
     # CORS Allowed Origins
     ALLOWED_ORIGINS: str = os.getenv("ALLOWED_ORIGINS", "*")
     
-    PORT: int = 8000
+    PORT: Any = 8000
     HOST: str = "0.0.0.0"
+
+    @field_validator("PORT", mode="before")
+    @classmethod
+    def parse_port(cls, v):
+        if isinstance(v, int):
+            return v
+        try:
+            return int(str(v).strip())
+        except Exception:
+            numbers = re.findall(r"\b\d{2,5}\b", str(v))
+            return int(numbers[-1]) if numbers else 8000
 
     model_config = SettingsConfigDict(case_sensitive=True, extra="ignore", env_file=".env")
 
