@@ -9,7 +9,7 @@ from app.agents.poly_agent import POLY_SYSTEM_INSTRUCTION
 logger = logging.getLogger(__name__)
 
 # Target Model for Gemini Live Preview
-LIVE_MODEL_NAME = "gemini-3.1-flash-live-preview"
+LIVE_MODEL_NAME = "gemini-2.0-flash-live-001"
 
 class GeminiLiveService:
     def __init__(self, session_id: str):

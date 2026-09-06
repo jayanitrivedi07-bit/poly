@@ -35,7 +35,7 @@ class PolyAgent:
     def __init__(self):
         self.api_key = settings.GEMINI_API_KEY
         self.client = None
-        self.model_name = settings.GEMINI_MODEL or "gemini-3.5-flash"
+        self.model_name = settings.GEMINI_MODEL or "gemini-2.0-flash"
         
         if self.api_key and self.api_key != "mock_gemini_api_key":
             try:
