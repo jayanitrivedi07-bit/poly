@@ -16,8 +16,8 @@ class PolySession:
             {
                 "id": "t-0",
                 "speaker": "poly",
-                "name": "POLY Assistant",
-                "timestamp": "00:05",
+                "speaker_name": "POLY Assistant",
+                "timestamp_offset": "00:05",
                 "originalText": "Namaste! Welcome to Poly Support. How can I help you with your account today?",
                 "translatedText": "Namaste! Welcome to Poly Support. How can I help you with your account today?"
             }
@@ -42,8 +42,8 @@ class PolySession:
         self.transcript.append({
             "id": turn_id,
             "speaker": "caller",
-            "name": self.state["customer_name"],
-            "timestamp": "00:15",
+            "speaker_name": self.state["customer_name"],
+            "timestamp_offset": "00:15",
             "originalText": text,
             "translatedText": text,
             "language": self.state["active_language"]
@@ -59,8 +59,8 @@ class PolySession:
             self.transcript.append({
                 "id": poly_turn_id,
                 "speaker": "poly",
-                "name": "POLY Assistant",
-                "timestamp": "00:20",
+                "speaker_name": "POLY Assistant",
+                "timestamp_offset": "00:20",
                 "originalText": response_text,
                 "translatedText": response_text
             })

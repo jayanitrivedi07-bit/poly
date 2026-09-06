@@ -9,6 +9,7 @@ class AgentInteractRequest(BaseModel):
 class AgentInteractResponse(BaseModel):
     session_id: str
     agora_channel: str
+    turn_id: Optional[str] = None
     response_text: Optional[str] = None
     action: str
     state: Dict[str, Any]
