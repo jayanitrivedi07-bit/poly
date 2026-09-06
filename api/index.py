@@ -1,16 +1,11 @@
-from fastapi import FastAPI
 import sys
 import os
 
-app = FastAPI()
+# Ensure the api directory is in sys.path so 'from app.xxx import ...' resolves directly
+current_dir = os.path.dirname(__file__)
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
 
-@app.get("/api/v1/health")
-@app.get("/health")
-def health():
-    return {
-        "status": "ok",
-        "python_version": sys.version,
-        "cwd": os.getcwd(),
-        "task_files": os.listdir("/var/task") if os.path.exists("/var/task") else [],
-        "cwd_files": os.listdir(".")
-    }
+from app.main import app
+
+__all__ = ["app"]
