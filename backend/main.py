@@ -6,8 +6,11 @@ if backend_dir not in sys.path:
     sys.path.insert(0, backend_dir)
 
 from app.main import app
-from mangum import Mangum
 
-handler = Mangum(app, lifespan="off")
+try:
+    from mangum import Mangum
+    handler = Mangum(app, lifespan="off")
+except ImportError:
+    handler = app
 
 __all__ = ["app", "handler"]
