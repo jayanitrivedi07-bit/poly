@@ -7,6 +7,7 @@ from app.services.escalation_service import EscalationService
 router = APIRouter()
 
 @router.get("/")
+@router.get("")
 def list_cases(status: Optional[str] = None, search: Optional[str] = None):
     """Lists all customer cases with optional status filtering and search query."""
     db = SessionLocal()
