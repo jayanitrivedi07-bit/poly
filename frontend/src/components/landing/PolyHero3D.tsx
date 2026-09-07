@@ -5,6 +5,7 @@ export const PolyHero3D: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [activeStep, setActiveStep] = useState<string>('LISTEN');
+  const [webGLError, setWebGLError] = useState<boolean>(false);
 
   useEffect(() => {
     if (!containerRef.current || !canvasRef.current) return;
@@ -21,16 +22,22 @@ export const PolyHero3D: React.FC = () => {
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
     camera.position.set(0, 0, 8.5);
 
-    // WebGL Renderer Setup
-    const renderer = new THREE.WebGLRenderer({
-      canvas: canvasRef.current,
-      alpha: true,
-      premultipliedAlpha: false,
-      antialias: true,
-      powerPreference: 'high-performance'
-    });
-    renderer.setSize(width, height, false);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    // WebGL Renderer Setup with WebGL1/WebGL2 safety wrapper
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        canvas: canvasRef.current,
+        alpha: true,
+        antialias: true,
+        powerPreference: 'high-performance'
+      });
+      renderer.setSize(width, height, false);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    } catch (e) {
+      console.warn('WebGL initialization failed, using CSS fallback visual:', e);
+      setWebGLError(true);
+      return;
+    }
 
     // Lights Setup (POLY Brand Colors)
     const ambientLight = new THREE.AmbientLight(0xFFF8F5, 1.2);
@@ -57,18 +64,13 @@ export const PolyHero3D: React.FC = () => {
 
     // 1. Central Translucent Sphere (POLY Core)
     const sphereGeo = new THREE.IcosahedronGeometry(1.8, 3);
-    const sphereMat = new THREE.MeshPhysicalMaterial({
+    const sphereMat = new THREE.MeshStandardMaterial({
       color: 0x38607A,
       emissive: 0x263845,
-      roughness: 0.15,
+      roughness: 0.25,
       metalness: 0.1,
-      transmission: 0.6,
       transparent: true,
-      opacity: 0.85,
-      ior: 1.3,
-      thickness: 1.2,
-      clearcoat: 0.8,
-      clearcoatRoughness: 0.2
+      opacity: 0.85
     });
     const mainSphere = new THREE.Mesh(sphereGeo, sphereMat);
     polyCoreGroup.add(mainSphere);
@@ -253,7 +255,7 @@ export const PolyHero3D: React.FC = () => {
 
     // Window Resize Listener
     const handleResize = () => {
-      if (!containerRef.current || !canvasRef.current) return;
+      if (!containerRef.current || !canvasRef.current || !renderer) return;
       const newW = containerRef.current.clientWidth;
       const newH = containerRef.current.clientHeight;
       if (newW > 0 && newH > 0) {
@@ -309,7 +311,9 @@ export const PolyHero3D: React.FC = () => {
         particlesMesh.rotation.y = elapsedTime * 0.03;
       }
 
-      renderer.render(scene, camera);
+      if (renderer) {
+        renderer.render(scene, camera);
+      }
     };
 
     animate();
@@ -333,15 +337,25 @@ export const PolyHero3D: React.FC = () => {
       ringMat3.dispose();
       particleGeo.dispose();
       particleMat.dispose();
-      renderer.dispose();
+      if (renderer) {
+        renderer.dispose();
+      }
     };
   }, []);
 
   return (
     <div ref={containerRef} className="relative w-full h-[520px] md:h-[620px] flex items-center justify-center overflow-hidden">
       
-      {/* Three.js Canvas */}
-      <canvas ref={canvasRef} className="w-full h-full block cursor-grab active:cursor-grabbing" />
+      {/* Three.js Canvas or Fallback */}
+      {!webGLError ? (
+        <canvas ref={canvasRef} className="w-full h-full block cursor-grab active:cursor-grabbing" />
+      ) : (
+        <div className="w-full h-full flex flex-col items-center justify-center relative bg-gradient-to-b from-[#263845] to-[#152028] p-8 text-[#FFF8F5]">
+          <div className="w-48 h-48 rounded-full bg-gradient-to-tr from-[#38607A] via-[#69577E] to-[#7E4F50] blur-xl opacity-60 animate-pulse mb-4" />
+          <span className="font-extrabold text-2xl tracking-tight mb-2">POLY Intelligence Engine</span>
+          <span className="text-xs text-[#BFC9D0] uppercase tracking-wider font-semibold">Real-Time Multilingual Voice AI</span>
+        </div>
+      )}
 
       {/* Storytelling Indicator Overlay (Listen -> Understand -> Confirm -> Escalate) */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-[#FFF8F5]/90 backdrop-blur-md px-4 py-1.5 rounded-full border border-[#BFC9D0]/50 shadow-xs text-[11px] font-bold text-[#263845]">
@@ -365,3 +379,4 @@ export const PolyHero3D: React.FC = () => {
     </div>
   );
 };
+
