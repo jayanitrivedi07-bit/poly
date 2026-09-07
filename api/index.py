@@ -1,38 +1,38 @@
-from fastapi import FastAPI
 import sys
 import os
 import traceback
 
-app = FastAPI()
+# Ensure backend directory is discoverable in Python's module search path
+backend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "backend"))
+if backend_dir not in sys.path:
+    sys.path.insert(0, backend_dir)
 
-@app.get("/api/v1/health")
-def health():
-    results = {}
-    backend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "backend"))
-    if backend_dir not in sys.path:
-        sys.path.insert(0, backend_dir)
-    
-    modules_to_test = [
-        "app.core.config",
-        "app.core.agora",
-        "app.database.session",
-        "app.models.all_models",
-        "app.schemas.agent",
-        "app.services.session_manager",
-        "app.agents.poly_agent",
-        "app.api.v1.health",
-        "app.api.v1.agent",
-        "app.api.router",
-        "app.main",
-    ]
-    for mod in modules_to_test:
+# Also ensure root directory is in sys.path
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+
+try:
+    from backend.app.main import app  # type: ignore
+except Exception:
+    try:
+        from app.main import app  # type: ignore
+    except Exception as e:
+        err_tb = traceback.format_exc()
         try:
-            __import__(mod)
-            results[mod] = "OK"
+            from fastapi import FastAPI
+            from fastapi.responses import JSONResponse
+
+            app = FastAPI()
+
+            @app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"])
+            async def debug_err(path: str):
+                return JSONResponse(
+                    status_code=500,
+                    content={"error": "FastAPI initialization failed in api/index.py", "traceback": err_tb}
+                )
         except Exception:
-            results[mod] = traceback.format_exc()
-            break
-            
-    return results
+            raise e
 
 __all__ = ["app"]
+
