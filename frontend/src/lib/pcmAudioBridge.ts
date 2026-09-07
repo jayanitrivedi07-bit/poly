@@ -126,10 +126,12 @@ export class PCMAudioBridge {
   }
 
   public interruptPlayback() {
-    console.log(
-      `[INTERRUPTION_EXECUTE] Stopping Poly voice audio queue. ` +
-      `polyCurrentlySpeaking=${this.polyCurrentlySpeaking}, callerInputDetected=${this.callerInputDetected}`
-    );
+    if (this.polyCurrentlySpeaking || this.activeSources.length > 0) {
+      console.log(
+        `[INTERRUPTION_EXECUTE] Stopping Poly voice audio queue. ` +
+        `polyCurrentlySpeaking=${this.polyCurrentlySpeaking}, callerInputDetected=${this.callerInputDetected}`
+      );
+    }
     for (const source of this.activeSources) {
       try {
         source.stop();

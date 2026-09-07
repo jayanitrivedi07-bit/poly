@@ -68,7 +68,7 @@ class AgoraService {
     }
 
     if (this.isInitializing && this.activeInitPromise) {
-      console.log('Agora session initialization in progress. Awaiting current initialization task...');
+      console.debug('Agora session initialization in progress. Awaiting current initialization task...');
       return this.activeInitPromise;
     }
 

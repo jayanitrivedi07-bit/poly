@@ -1,0 +1,10 @@
+{
+  "include": [
+    "api",
+    "backend"
+  ],
+  "extraPaths": [
+    "backend",
+    "."
+  ]
+}
